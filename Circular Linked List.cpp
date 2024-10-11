@@ -1,7 +1,3 @@
-
-//Group mates Tahmid Hossain, Erfan Sadir, Jael McBride
-//breakout room 10
-
 #include <iostream>
 using namespace std;
 
