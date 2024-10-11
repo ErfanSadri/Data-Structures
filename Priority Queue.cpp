@@ -1,4 +1,4 @@
-//Lab 10 Priority Queue
+//Priority Queue
 // Erfan Sadri
 
 #include <iostream>
