@@ -1,0 +1,163 @@
+//Erfan Sadri
+
+#include <iostream>
+#include <vector>
+using namespace std;
+
+class KeyValue {
+public:
+    int key;
+    int value;
+    bool occupied;
+    KeyValue() : key(0), value(0), occupied(false) {}
+};
+
+class HashTable {
+private:
+    static const double LOAD_FACTOR_THRESHOLD;
+    static const int INITIAL_SIZE;
+    vector<KeyValue> table;
+    int numStoredElements;
+
+    int hash(int key) {
+        return key % table.size();
+    }
+
+    void rehash() {
+        unsigned long newSize = table.size() * 2;
+        vector<KeyValue> newTable(newSize);
+        for (size_t i = 0; i <table.size(); ++i) {
+            if (table.at(i).occupied) {
+                int newIndex = table.at(i).key % newSize;
+                while (newTable.at(newIndex).occupied) {
+                    newIndex = (newIndex + 1) % newSize;
+                }
+                newTable.at(newIndex) = table.at(i);
+            }
+        }
+        table = newTable;
+    }
+
+public:
+
+    HashTable() : numStoredElements(0) {
+        table.resize(INITIAL_SIZE);
+    }
+
+    void insert(int key, int value) {
+        if (static_cast<double>(numStoredElements + 1) / table.size() > LOAD_FACTOR_THRESHOLD) {
+            rehash();
+        }
+
+        int index = hash(key);
+        while (table.at(index).occupied) {
+            index = (index + 1) % table.size();
+        }
+        table.at(index).key = key;
+        table.at(index).value = value;
+        table.at(index).occupied = true;
+        numStoredElements++;
+    }
+
+    int get(int key) {
+        int value = -1;
+        int probes = 0;
+        int index = hash(key);
+        while (probes < table.size() && table.at(index).occupied) {
+            if (table.at(index).key == key) {
+                value = table.at(index).value;
+                break;
+            }
+            index = (index + 1) % table.size();
+            probes++;
+        }
+        return value;
+    }
+
+    void remove(int key) {
+        int index = hash(key);
+        int probes = 0;
+        while (probes < table.size() && table.at(index).occupied) {
+            if (table.at(index).key == key) {
+                table.at(index).occupied = false;
+                numStoredElements--;
+                break;
+            }
+            index = (index + 1) % table.size();
+            probes++;
+        }
+    }
+
+    void update(int key, int value) {
+        int index = hash(key);
+        int probes = 0;
+        while (probes < table.size() && table.at(index).occupied) {
+            if (table.at(index).key == key) {
+                table.at(index).value = value;
+                break;
+            }
+            index = (index + 1) % table.size();
+            probes++;
+        }
+    }
+
+    double loadFactor() const {
+        return static_cast<double>(numStoredElements) / table.size();
+    }
+
+    void clear() {
+        numStoredElements = 0;
+
+        for (size_t i = 0; i <table.size(); ++i){
+            table.at(i).key = -1;
+            table.at(i).value = -1;
+            table.at(i).occupied = false;
+        }
+
+        table.resize(INITIAL_SIZE);
+    }
+
+    void resizeTable(int newSize) {
+        vector<KeyValue> newTable(newSize);
+        for (size_t i = 0; i <table.size(); ++i) {
+            const KeyValue& entry = table.at(i);
+            if (entry.occupied) {
+                int newIndex = entry.key % newSize;
+                while (newTable.at(newIndex).occupied) {
+                    newIndex = (newIndex + 1) % newSize;
+                }
+                newTable.at(newIndex) = entry;
+            }
+        }
+        table = newTable;
+    }
+};
+
+const double HashTable::LOAD_FACTOR_THRESHOLD = 0.9;
+const int HashTable::INITIAL_SIZE = 10;
+
+int main() {
+    HashTable hashTable;
+    hashTable.insert(19, 100);
+    hashTable.insert(1, 200);
+    hashTable.insert(3, 200);
+    hashTable.insert(2, 200);
+    hashTable.insert(4, 200);
+
+
+    cout << "key= 19 Value = " << hashTable.get(19) << endl;
+    cout << "key= 9 Value = " << hashTable.get(9) << endl;
+    hashTable.update(9, 300);
+
+    cout << "Load Factor: " << hashTable.loadFactor() << endl;
+
+    hashTable.resizeTable(20);
+
+    cout << "Load Factor: " << hashTable.loadFactor() << endl;
+
+    hashTable.clear();
+
+    cout << "key= 9 Value = " << hashTable.get(9) << endl;
+
+    return 0;
+}
