@@ -1,6 +1,3 @@
-//Erfan Sadri P1 Recursion
-//Programming Excersice 2
-
 #include <iostream>
 using namespace std;
 
