@@ -1,4 +1,4 @@
-//Lab 9 Erfan Sadri
+//Erfan Sadri
 
 #include <iostream>
 #include <stack>
